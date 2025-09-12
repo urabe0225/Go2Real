@@ -55,3 +55,31 @@ RUN pip install tensorboard rsl-rl-lib==2.2.4
 
 RUN git clone https://github.com/Genesis-Embodied-AI/Genesis.git
 
+
+# X11とOpenGLのサポートをインストール
+RUN apt-get update && apt-get install -y \
+    x11-apps \
+    libgl1-mesa-glx \
+    libgl1-mesa-dri \
+    libglib2.0-0 \
+    libxrender1 \
+    libxtst6 \
+    libxi6 \
+    libxrandr2 \
+    libxss1 \
+    libxcursor1 \
+    libxcomposite1 \
+    libasound2 \
+    libxdamage1 \
+    libxfixes3 \
+    libxinerama1 \
+    ca-certificates \
+    fonts-liberation \
+    libappindicator3-1 \
+    libnss3 \
+    lsb-release \
+    xdg-utils
+
+# 環境変数設定
+ENV DISPLAY=:0
+ENV QT_X11_NO_MITSHM=1

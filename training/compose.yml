@@ -15,8 +15,10 @@ services:
               capabilities: [gpu]
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${HOME}/.Xauthority:/root/.Xauthority:rw
       - ./logs/:/workspace/logs/
     working_dir: /workspace
+    privileged: true
     environment:
       - CYCLONEDX_HOME=/workspace/cyclonedx/install
       - NVIDIA_VISIBLE_DEVICES=all
