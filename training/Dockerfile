@@ -8,32 +8,9 @@ RUN apt-get update && apt-get install -y \
     python3.10 \
     python3-pip \
     python3.10-dev \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-WORKDIR /workspace
-
-RUN git clone https://github.com/eclipse-cyclonedds/cyclonedds.git && \
-    cd cyclonedds && \
-    git checkout releases/0.10.x && \
-    mkdir build install && cd build && \
-    cmake .. -DCMAKE_INSTALL_PREFIX=../install && \
-    cmake --build . --target install
-
-ENV CYCLONEDDS_HOME=/workspace/cyclonedds/install
-RUN git clone https://github.com/unitreerobotics/unitree_sdk2_python.git && \
-    cd unitree_sdk2_python && \
-    git submodule update --init --recursive && \
-    pip install -e .
-
-RUN pip install genesis-world==0.3.3
-RUN pip install tensorboard rsl-rl-lib==2.2.4
-
-RUN git clone https://github.com/Genesis-Embodied-AI/Genesis.git
-
-RUN apt-get update && apt-get install -y \
-    net-tools \
-    iputils-ping \
-    iproute2 \
+    #net-tools \
+    #iputils-ping \
+    #iproute2 \
     libgl1-mesa-glx \
     libgl1-mesa-dev \
     libglu1-mesa-dev \
@@ -60,3 +37,24 @@ RUN apt-get update && apt-get install -y \
     libxi6 \
     libxtst6 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /workspace
+
+RUN git clone https://github.com/eclipse-cyclonedds/cyclonedds.git && \
+    cd cyclonedds && \
+    git checkout releases/0.10.x && \
+    mkdir build install && cd build && \
+    cmake .. -DCMAKE_INSTALL_PREFIX=../install && \
+    cmake --build . --target install
+
+ENV CYCLONEDDS_HOME=/workspace/cyclonedds/install
+RUN git clone https://github.com/unitreerobotics/unitree_sdk2_python.git && \
+    cd unitree_sdk2_python && \
+    git submodule update --init --recursive && \
+    pip install -e .
+
+RUN pip install genesis-world==0.3.3
+RUN pip install tensorboard rsl-rl-lib==2.2.4
+
+RUN git clone https://github.com/Genesis-Embodied-AI/Genesis.git
+

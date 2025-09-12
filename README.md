@@ -1,5 +1,9 @@
 # Go2Real
 
+docker
+nvidia container toolkit
+
+
 ## Go2の検出
 '''
 cd ./Go2Real/
@@ -11,7 +15,7 @@ docker exec -it go2real-go2_controller-1 python /workspace/networkTest.py
 '''
 cd ./Go2Real/
 docker compose up -d
-docker exec -it go2real-go2_controller-1 python python /workspace/unitree_sdk2_python/example/go2/low_level/go2_stand_example.py enp2s0
+docker exec -it go2real-go2_controller-1 python /workspace/unitree_sdk2_python/example/go2/low_level/go2_stand_example.py enp2s0
 '''
 
 ## 学習環境の構築

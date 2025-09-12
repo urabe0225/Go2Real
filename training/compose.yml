@@ -15,7 +15,7 @@ services:
               capabilities: [gpu]
     volumes:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
-    #  - .:/workspace
+      - ./logs/:/workspace/logs/
     working_dir: /workspace
     environment:
       - CYCLONEDX_HOME=/workspace/cyclonedx/install
