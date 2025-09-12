@@ -1,0 +1,8 @@
+version: '3'
+services:
+  go2_controller:
+    build: .
+    network_mode: host
+    command: sleep infinity
+#    volumes:
+#      - .:/workspace
