@@ -8,9 +8,6 @@ RUN apt-get update && apt-get install -y \
     python3.10 \
     python3-pip \
     python3.10-dev \
-    #net-tools \
-    #iputils-ping \
-    #iproute2 \
     libgl1-mesa-glx \
     libgl1-mesa-dev \
     libglu1-mesa-dev \
