@@ -7,7 +7,6 @@ RUN apt-get update && apt-get install -y \
     iproute2 \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-
 WORKDIR /workspace
 
 RUN git clone https://github.com/eclipse-cyclonedds/cyclonedds.git && \

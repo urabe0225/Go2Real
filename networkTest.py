@@ -14,10 +14,6 @@ from unitree_sdk2py.utils.thread import RecurrentThread
 from unitree_sdk2py.comm.motion_switcher.motion_switcher_client import MotionSwitcherClient
 from unitree_sdk2py.go2.sport.sport_client import SportClient
 
-class Go2Controller:
-    def __init__(self, onnx_model_path=None):
-        pass
-
 def find_go2_interface():
     """Go2に接続可能なネットワークインターフェースを自動検出"""
     go2_ips = ['192.168.123.161', '192.168.123.1', '192.168.123.15']
