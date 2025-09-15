@@ -1,0 +1,24 @@
+services:
+  mujoco:
+    container_name: mujoco
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    network_mode: host
+    tty: true
+    stdin_open: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    devices:
+      - /dev/dri:/dev/dri
+    environment:
+      - DISPLAY=${DISPLAY}
+    volumes:
+      - ${HOME}/.Xauthority:/root/.Xauthority
+    command: sleep infinity
+
