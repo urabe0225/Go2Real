@@ -25,3 +25,19 @@ cd ./Go2Real/training/
 docker compose up -d
 docker exec -it training-go2_controller-1 python3 Genesis/examples/locomotion/go2_train.py
 '''
+
+## 検証
+'''
+xhost +local:docker
+cd ./Go2Real/training/
+docker compose up -d
+docker exec -it training-go2_controller-1 python3 Genesis/examples/locomotion/go2_eval.py
+'''
+> 本来はGUIが起動するが対応できていない
+
+## Sim2Real ※未検証
+'''
+cd ./Go2Real/sim2real/
+docker compose up -d
+docker exec -it sim2real-go2_controller-1 python3 /workspace/sim2real_walk.py enp2s0
+'''
