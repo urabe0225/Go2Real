@@ -1,0 +1,30 @@
+services:
+  go2_controller:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    network_mode: host
+    tty: true
+    stdin_open: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${HOME}/.Xauthority:/root/.Xauthority:rw
+      - ../training/logs/:/workspace/logs/
+    working_dir: /workspace
+    privileged: true
+    environment:
+      - CYCLONEDX_HOME=/workspace/cyclonedx/install
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - DISPLAY=${DISPLAY}
+      - XAUTHORITY=${XAUTHORITY}
+      - QT_X11_NO_MITSHM=1
+    command: sleep infinity
+
