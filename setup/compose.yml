@@ -1,8 +1,6 @@
-version: '3'
 services:
-  go2_controller:
+  setup:
     build: .
+    container_name: setup
     network_mode: host
     command: sleep infinity
-#    volumes:
-#      - .:/workspace
