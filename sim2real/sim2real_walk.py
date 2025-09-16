@@ -74,6 +74,24 @@ def load_configs(exp_name):
     cfg_path = os.path.join("./logs", exp_name, "cfgs.pkl")
     with open(cfg_path, "rb") as f:
         env_cfg, obs_cfg, reward_cfg, command_cfg, train_cfg = pickle.load(f)
+
+    # Add missing dof_names if not present
+    if "dof_names" not in env_cfg:
+        env_cfg["dof_names"] = [
+            "FR_hip_joint",
+            "FR_thigh_joint",
+            "FR_calf_joint",
+            "FL_hip_joint",
+            "FL_thigh_joint",
+            "FL_calf_joint",
+            "RR_hip_joint",
+            "RR_thigh_joint",
+            "RR_calf_joint",
+            "RL_hip_joint",
+            "RL_thigh_joint",
+            "RL_calf_joint",
+        ]
+
     return env_cfg, obs_cfg, reward_cfg, command_cfg, train_cfg
 
 class RealRobotDeployer:
