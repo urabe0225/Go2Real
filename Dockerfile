@@ -56,3 +56,10 @@ RUN pip install -r /tmp/requirements.txt
 #RUN pip install --no-cache-dir genesis-world==0.3.3
 RUN pip install --no-cache-dir tensorboard rsl-rl-lib==2.2.4
 
+###############################################################################
+FROM go2-base AS go2-real
+
+COPY ./sim2real/sim2real_walk.py /workspace/sim2real_walk.py
+COPY ./sim2real/unitree_legged_const.py /workspace/unitree_legged_const.py
+COPY ./sim2real/my_genesis_go2_env.py /workspace/my_genesis_go2_env.py
+COPY ./sim2real/go2_env.py /workspace/go2_env.py
