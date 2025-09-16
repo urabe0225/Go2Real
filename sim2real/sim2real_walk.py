@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+import argparse
 import csv
 import threading
 import time
@@ -69,6 +70,7 @@ def rotate_vector_by_quat(v, q):
     rotated = quat_multiply(tmp, q_conj)
     return rotated[1:]  # vector部分
 
+''' --- IGNORE ---
 # 設定ファイルのロード（以前のコードと同様に cfgs.pkl を利用）
 def load_configs(exp_name):
     cfg_path = os.path.join("./logs", exp_name, "cfgs.pkl")
@@ -93,7 +95,7 @@ def load_configs(exp_name):
         ]
 
     return env_cfg, obs_cfg, reward_cfg, command_cfg, train_cfg
-
+'''
 class RealRobotDeployer:
     """
     実機の低レベルセンサデータ（low_state）から obs を構築し，
@@ -103,9 +105,60 @@ class RealRobotDeployer:
         self.startPos = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
         self.policy = policy
         # self.env_cfg = env_cfg
+        '''
+        env_cfg:  {
+            'num_actions': 12, 
+            'default_joint_angles': {
+                'FL_hip_joint': 0.0, 
+                'FR_hip_joint': 0.0, 
+                'RL_hip_joint': 0.0, 
+                'RR_hip_joint': 0.0, 
+                'FL_thigh_joint': 0.8, 
+                'FR_thigh_joint': 0.8, 
+                'RL_thigh_joint': 1.0, 
+                'RR_thigh_joint': 1.0, 
+                'FL_calf_joint': -1.5, 
+                'FR_calf_joint': -1.5, 
+                'RL_calf_joint': -1.5, 
+                'RR_calf_joint': -1.5}, 
+            'joint_names': [
+                'FR_hip_joint', 
+                'FR_thigh_joint', 
+                'FR_calf_joint', 
+                'FL_hip_joint', 
+                'FL_thigh_joint', 
+                'FL_calf_joint', 
+                'RR_hip_joint', 
+                'RR_thigh_joint', 
+                'RR_calf_joint', 
+                'RL_hip_joint', 
+                'RL_thigh_joint', 
+                'RL_calf_joint'], 
+            'kp': 20.0, 
+            'kd': 0.5, 
+            'termination_if_roll_greater_than': 10, 
+            'termination_if_pitch_greater_than': 10, 
+            'base_init_pos': [ 0.0, 0.0, 0.42], 
+            'base_init_quat': [1.0, 0.0, 0.0, 0.0], 
+            'episode_length_s': 20.0, 
+            'resampling_time_s': 4.0, 
+            'action_scale': 0.25, 
+            'simulate_action_latency': True, 
+            'clip_actions': 100.0}
+        '''
         # self.obs_cfg = obs_cfg
+        '''
+        {'num_obs': 45, 
+        'obs_scales': {
+            'lin_vel': 2.0, 
+            'ang_vel': 0.25, 
+            'dof_pos': 1.0, 
+            'dof_vel': 0.05}}
+        '''
         self.env = env
-        self.device = "cpu"
+
+        self.device = gs.device#"cpu"
+
         self.num_envs = 1
         self.num_actions = self.env.env_cfg["num_actions"]
         self.action_scale = self.env.env_cfg["action_scale"]
@@ -157,7 +210,8 @@ class RealRobotDeployer:
         
         # 関節角度のデフォルト値
         self.default_dof_pos = torch.tensor(
-            [self.env.env_cfg["default_joint_angles"][name] for name in self.env.env_cfg["dof_names"]],
+            #[self.env.env_cfg["default_joint_angles"][name] for name in self.env.env_cfg["dof_names"]],
+            [self.env.env_cfg["default_joint_angles"][name] for name in dof_names],
             device="cpu",
             dtype=gs.tc_float,
         )
@@ -375,20 +429,24 @@ class RealRobotDeployer:
             self.csv_file.close()
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-e", "--exp_name", type=str, default="go2-walking")
+    parser.add_argument("--ckpt", type=int, default=100)
+    args = parser.parse_args()
+
     # DDS 通信初期化
     if len(sys.argv) > 1:
         ChannelFactoryInitialize(0, sys.argv[1])
     else:
         ChannelFactoryInitialize(0)
     
-    exp_name = "go2-walking"
-    ckpt = 1000
-    env_cfg, obs_cfg, reward_cfg, command_cfg, train_cfg = load_configs(exp_name)
-    log_dir = os.path.join("./logs", exp_name)
-    resume_path = os.path.join(log_dir, f"model_{ckpt}.pt")
-    
+    #env_cfg, obs_cfg, reward_cfg, command_cfg, train_cfg = load_configs(args.exp_name)
+    env_cfg, obs_cfg, reward_cfg, command_cfg, train_cfg = pickle.load(open(f"logs/{args.exp_name}/cfgs.pkl", "rb"))
+
+    log_dir = os.path.join("./logs", args.exp_name)
+ 
     gs.init(backend=gs.cpu)
-    
+
     # 学習済みポリシーのロード
     # ここではダミー環境（Go2Env）を用いて OnPolicyRunner 経由でロード
     from my_genesis_go2_env import Go2Env
@@ -401,13 +459,27 @@ def main():
         show_viewer=False,
     )
 
-    runner = OnPolicyRunner(env, train_cfg, log_dir, device="cpu")
+    print("env_cfg: ", env_cfg)
+    print("-"*40)
+    print("obs_cfg: ", obs_cfg)
+    print("-"*40)
+    print("reward_cfg: ", reward_cfg)
+    print("-"*40)
+    print("command_cfg: ", command_cfg)
+    print("-"*40)
+    print("train_cfg: ", train_cfg)
+    print("-"*40)
+    print("env: ", env)
+    print("-"*40)
+
+    runner = OnPolicyRunner(env, train_cfg, log_dir, gs.device)
+    resume_path = os.path.join(log_dir, f"model_{args.ckpt}.pt")
     runner.load(resume_path)
-    policy = runner.get_inference_policy(device="cpu")
+    policy = runner.get_inference_policy(gs.device)
     
     # RealRobotDeployer の初期化
     deployer = RealRobotDeployer(policy, env_cfg, obs_cfg, env)
-    
+
     print("Waiting for low_state from real robot...")
     while deployer.low_state is None:
         time.sleep(0.1)
