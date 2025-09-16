@@ -23,7 +23,7 @@ docker exec -it setup python /workspace/unitree_sdk2_python/example/go2/low_leve
 '''
 cd ./Go2Real/training/
 docker compose up -d
-docker exec -it training-go2_controller-1 python3 Genesis/examples/locomotion/go2_train.py
+docker exec -it go2_controller python3 Genesis/examples/locomotion/go2_train.py -e go2-walking --max_iterations 1001
 '''
 
 ## 検証
@@ -31,7 +31,7 @@ docker exec -it training-go2_controller-1 python3 Genesis/examples/locomotion/go
 xhost +local:docker
 cd ./Go2Real/training/
 docker compose up -d
-docker exec -it training-go2_controller-1 python3 Genesis/examples/locomotion/go2_eval.py
+docker exec -it go2_controller python3 Genesis/examples/locomotion/go2_eval.py -e go2-walking --ckpt 1000
 '''
 > 本来はGUIが起動するが対応できていない
 
