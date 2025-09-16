@@ -1,8 +1,7 @@
 # Go2Real
 
-docker
-nvidia container toolkit
-
+- [docker](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
+- [nvidia container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#with-apt-ubuntu-debian)
 
 ## Go2の検出
 '''
@@ -22,6 +21,5 @@ docker exec -it setup python /workspace/unitree_sdk2_python/example/go2/low_leve
 - 前進機能
 '''
 cd ./Go2Real/training/
-docker compose up -d
-docker exec -it training-go2_controller-1 python3 Genesis/examples/locomotion/go2_train.py
+docker compose up 
 '''

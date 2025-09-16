@@ -1,8 +1,10 @@
 services:
   go2_controller:
     build: 
-      context: .
+      context: ..
       dockerfile: Dockerfile
+      target: go2-base
+    container_name: go2_controller
     network_mode: host
     tty: true
     stdin_open: true
@@ -14,17 +16,11 @@ services:
               count: all
               capabilities: [gpu]
     volumes:
-      - /tmp/.X11-unix:/tmp/.X11-unix:rw
-      - ${HOME}/.Xauthority:/root/.Xauthority:rw
-      - ./logs/:/workspace/logs/
+      - ../logs/:/workspace/logs/
     working_dir: /workspace
     privileged: true
-    environment:
-      - CYCLONEDX_HOME=/workspace/cyclonedx/install
-      - NVIDIA_VISIBLE_DEVICES=all
-      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
-      - DISPLAY=${DISPLAY}
-      - XAUTHORITY=${XAUTHORITY}
-      - QT_X11_NO_MITSHM=1
-    command: sleep infinity
-
+    command: >
+      /bin/bash -c "
+      tensorboard --logdir logs &
+      python3 Genesis/examples/locomotion/go2_train.py --exp_name go2-walking --max_iterations 1001 &
+      wait"
