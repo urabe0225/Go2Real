@@ -21,8 +21,7 @@ docker exec -it setup python /workspace/unitree_sdk2_python/example/go2/low_leve
 - 前進機能
 '''
 cd ./Go2Real/training/
-docker compose up -d
-docker exec -it go2_controller python3 Genesis/examples/locomotion/go2_train.py -e go2-walking --max_iterations 1001
+docker compose up
 '''
 
 ## 検証
