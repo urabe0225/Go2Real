@@ -1,0 +1,34 @@
+services:
+  go2_eval:
+    build: 
+      context: ..
+      dockerfile: Dockerfile
+      target: go2-base
+    container_name: go2_eval
+    network_mode: host
+    tty: true
+    stdin_open: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - ../logs/:/workspace/logs/
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+      - ${HOME}/.Xauthority:/root/.Xauthority:rw
+    working_dir: /workspace
+    privileged: true
+    environment:
+      - CYCLONEDX_HOME=/workspace/cyclonedx/install
+      - NVIDIA_VISIBLE_DEVICES=all
+      - NVIDIA_DRIVER_CAPABILITIES=compute,utility
+      - DISPLAY=${DISPLAY}
+      - XAUTHORITY=${XAUTHORITY}
+      - QT_X11_NO_MITSHM=1
+    command: >
+      /bin/bash -c "
+      python3 Genesis/examples/locomotion/go2_eval.py --exp_name go2-test --ckpt 100 &
+      wait"
