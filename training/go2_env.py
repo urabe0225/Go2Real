@@ -157,7 +157,6 @@ class Go2Env:
             restitution_val = new_restitution[i].item() if torch.is_tensor(new_restitution[i]) else new_restitution[i]
             
             # 地面の物理パラメータを設定
-            print("[env_idx_val]:", [env_idx_val], "[friction_val]:", [friction_val], "[restitution_val]:", [restitution_val])
             self.plane.set_friction(friction_val)#(friction_val, [env_idx_val])
             #self.plane.set_restitution(restitution_val, envs_idx=[env_idx_val])
             
