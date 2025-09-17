@@ -57,6 +57,11 @@ RUN pip install -r /tmp/requirements.txt
 RUN pip install --no-cache-dir tensorboard rsl-rl-lib==2.2.4
 
 ###############################################################################
+FROM go2-base AS go2-train
+COPY ./training/go2_env.py /workspace/Genesis/examples/locomotion/go2_env.py
+COPY ./training/go2_train.py /workspace/Genesis/examples/locomotion/go2_train.py
+
+###############################################################################
 FROM go2-base AS go2-real
 
 COPY ./sim2real/sim2real_walk.py /workspace/sim2real_walk.py
