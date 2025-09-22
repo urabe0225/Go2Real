@@ -44,12 +44,15 @@ class Go2Env:
                 constraint_solver=gs.constraint_solver.Newton,
                 enable_collision=True,
                 enable_joint_limit=True,
+                # for this locomotion policy there are usually no more than 30 collision pairs
+                # set a low value can save memory
+                max_collision_pairs=30,
             ),
             show_viewer=show_viewer,
         )
 
-        # add plain with randomized friction
-        self.plane = self.scene.add_entity(gs.morphs.URDF(file="urdf/plane/plane.urdf", fixed=True))
+        # add plain
+        self.scene.add_entity(gs.morphs.URDF(file="urdf/plane/plane.urdf", fixed=True))
 
         # add robot
         self.base_init_pos = torch.tensor(self.env_cfg["base_init_pos"], device=gs.device)
@@ -68,24 +71,6 @@ class Go2Env:
 
         # names to indices
         self.motors_dof_idx = [self.robot.get_joint(name).dof_start for name in self.env_cfg["joint_names"]]
-
-        # 足のリンクのインデックスを取得
-        self.foot_links = []
-        foot_names = ["FR_foot", "FL_foot", "RR_foot", "RL_foot"]
-        for foot_name in foot_names:
-            try:
-                foot_link = self.robot.get_link(foot_name)
-                self.foot_links.append(foot_link)
-            except:
-                print(f"Warning: Could not find foot link {foot_name}")
-
-        # 摩擦係数の範囲設定
-        self.friction_range = env_cfg.get("friction_range", [0.2, 1.5])  # [最小, 最大]
-        self.restitution_range = env_cfg.get("restitution_range", [0.0, 0.3])
-        
-        # 各環境の現在の摩擦係数を記録
-        self.current_friction = torch.zeros(num_envs, device=self.device)
-        self.current_restitution = torch.zeros(num_envs, device=self.device)
 
         # PD control parameters
         self.robot.set_dofs_kp([self.env_cfg["kp"]] * self.num_actions, self.motors_dof_idx)
@@ -130,41 +115,6 @@ class Go2Env:
         self.extras = dict()  # extra information for logging
         self.extras["observations"] = dict()
 
-    def _randomize_friction(self, envs_idx):
-        """指定された環境の摩擦係数をランダムに設定"""
-        if len(envs_idx) == 0:
-            return
-            
-        # 新しい摩擦係数とrestitutionをランダムに生成
-        new_friction = gs_rand_float(
-            self.friction_range[0], self.friction_range[1], 
-            (len(envs_idx),), self.device
-        )
-        new_restitution = gs_rand_float(
-            self.restitution_range[0], self.restitution_range[1],
-            (len(envs_idx),), self.device
-        )
-    
-        # 現在の値を更新
-        self.current_friction[envs_idx] = new_friction
-        self.current_restitution[envs_idx] = new_restitution
-    
-        # 地面と足の摩擦係数を設定
-        for i, env_idx in enumerate(envs_idx):
-            env_idx_val = env_idx.item() if torch.is_tensor(env_idx) else env_idx
-            
-            friction_val = new_friction[i].item() if torch.is_tensor(new_friction[i]) else new_friction[i]
-            restitution_val = new_restitution[i].item() if torch.is_tensor(new_restitution[i]) else new_restitution[i]
-            
-            # 地面の物理パラメータを設定
-            self.plane.set_friction(friction_val)#(friction_val, [env_idx_val])
-            #self.plane.set_restitution(restitution_val, envs_idx=[env_idx_val])
-            
-            # 足の物理パラメータを設定
-            for foot_link in self.foot_links:
-                foot_link.set_friction(friction_val, envs_idx=[env_idx_val])
-                foot_link.set_restitution(restitution_val, envs_idx=[env_idx_val])
-
     def _resample_commands(self, envs_idx):
         self.commands[envs_idx, 0] = gs_rand_float(*self.command_cfg["lin_vel_x_range"], (len(envs_idx),), gs.device)
         self.commands[envs_idx, 1] = gs_rand_float(*self.command_cfg["lin_vel_y_range"], (len(envs_idx),), gs.device)
@@ -200,16 +150,6 @@ class Go2Env:
             .reshape((-1,))
         )
         self._resample_commands(envs_idx)
-
-        # 摩擦係数の定期的な変更（オプション）
-        friction_resample_time = self.env_cfg.get("friction_resample_time_s", 8.0)  # 8秒ごと
-        friction_envs_idx = (
-            (self.episode_length_buf % int(friction_resample_time / self.dt) == 0)
-            .nonzero(as_tuple=False)
-            .reshape((-1,))
-        )
-        if len(friction_envs_idx) > 0:
-            self._randomize_friction(friction_envs_idx)
 
         # check termination and reset
         self.reset_buf = self.episode_length_buf > self.max_episode_length
@@ -259,9 +199,6 @@ class Go2Env:
     def reset_idx(self, envs_idx):
         if len(envs_idx) == 0:
             return
-
-        # リセット時に摩擦係数もランダマイズ
-        self._randomize_friction(envs_idx)
 
         # reset dofs
         self.dof_pos[envs_idx] = self.default_dof_pos

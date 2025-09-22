@@ -112,10 +112,6 @@ def get_cfgs():
         "action_scale": 0.25,
         "simulate_action_latency": True,
         "clip_actions": 100.0,
-        # 新しい摩擦関連のパラメータ
-        "friction_range": [0.2, 1.5],  # 低摩擦(氷)から高摩擦(ゴム)まで
-        "restitution_range": [0.0, 0.3],  # 反発係数
-        "friction_resample_time_s": 8.0,  # 摩擦係数を変更する間隔
     }
     obs_cfg = {
         "num_obs": 45,
@@ -141,8 +137,6 @@ def get_cfgs():
     }
     command_cfg = {
         "num_commands": 3,
-        #"lin_vel_x_range": [-0.5, 0.5], # 両方
-        #"lin_vel_x_range": [-0.5, -0.5], # 後退のみ
         "lin_vel_x_range": [0.5, 0.5],
         "lin_vel_y_range": [0, 0],
         "ang_vel_range": [0, 0],
