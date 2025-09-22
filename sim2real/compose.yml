@@ -1,0 +1,25 @@
+services:
+  go2real:
+    build: 
+      context: ..
+      dockerfile: Dockerfile
+      target: go2-real
+    container_name: go2real
+    network_mode: host
+    tty: true
+    stdin_open: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - ../logs/:/workspace/logs/
+    working_dir: /workspace
+    privileged: true
+    command: >
+      /bin/bash -c "
+      python3 /workspace/sim2real_walk.py enp2s0 &
+      wait"

@@ -1,0 +1,27 @@
+services:
+  go2_controller:
+    build: 
+      context: ..
+      dockerfile: Dockerfile
+      target: go2-train
+    container_name: go2_controller
+    network_mode: host
+    tty: true
+    stdin_open: true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - ../logs/:/workspace/logs/
+    working_dir: /workspace
+    privileged: true
+    command: sleep infinity
+#    command: >
+#      /bin/bash -c "
+#      tensorboard --logdir logs &
+#      python3 Genesis/examples/locomotion/go2_train.py --exp_name go2-walking --max_iterations 1001 &
+#      wait"
