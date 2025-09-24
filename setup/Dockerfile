@@ -25,4 +25,3 @@ RUN git clone https://github.com/unitreerobotics/unitree_sdk2_python.git && \
 RUN pip install genesis-world==0.3.3
 
 COPY networkTest.py /workspace/networkTest.py
-#COPY connectionTest.py /workspace/connectionTest.py

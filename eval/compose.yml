@@ -28,7 +28,4 @@ services:
       - DISPLAY=${DISPLAY}
       - XAUTHORITY=${XAUTHORITY}
       - QT_X11_NO_MITSHM=1
-    command: >
-      /bin/bash -c "
-      python3 Genesis/examples/locomotion/go2_eval.py --exp_name go2-test --ckpt 100 &
-      wait"
+    command: sleep infinity

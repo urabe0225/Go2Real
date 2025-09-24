@@ -57,10 +57,12 @@ RUN pip install -r /tmp/requirements.txt
 RUN pip install --no-cache-dir tensorboard rsl-rl-lib==2.2.4
 
 COPY ./scripts/go2_env.py /workspace/go2_env.py
+COPY ./scripts/friction_env.py /workspace/friction_env.py
 
 ###############################################################################
 FROM go2-base AS go2-train
 COPY ./training/go2_train.py /workspace/go2_train.py
+COPY ./training/friction_train.py /workspace/friction_train.py
 
 ###############################################################################
 FROM go2-base AS go2-real
