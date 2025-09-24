@@ -3,7 +3,7 @@
 - [docker](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository)
 - [nvidia container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#with-apt-ubuntu-debian)
 
-## GenesisのExampleを(前進機能)
+## GenesisのExampleで前進機能を学習
 
 ### Go2の検出
 - Go2を起動しイーサネットケーブルで接続
