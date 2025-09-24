@@ -19,7 +19,4 @@ services:
       - ../logs/:/workspace/logs/
     working_dir: /workspace
     privileged: true
-    command: >
-      /bin/bash -c "
-      python3 /workspace/sim2real_walk.py enp2s0 &
-      wait"
+    command: sleep infinity

@@ -432,11 +432,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-e", "--exp_name", type=str, default="go2-walking")
     parser.add_argument("--ckpt", type=int, default=1000)
+    parser.add_argument("--net", type=str, default="en2s0")
     args = parser.parse_args()
 
     # DDS 通信初期化
     if len(sys.argv) > 1:
-        ChannelFactoryInitialize(0, sys.argv[1])
+        ChannelFactoryInitialize(0, args.net)
     else:
         ChannelFactoryInitialize(0)
     

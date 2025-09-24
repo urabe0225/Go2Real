@@ -33,9 +33,9 @@ docker exec -it go2_controller python3 Genesis/examples/locomotion/go2_eval.py -
 '''
 > 本来はGUIが起動するが対応できていない
 
-## Sim2Real ※未検証
+## Sim2Real
 '''
 cd ./Go2Real/sim2real/
 docker compose up -d
-docker exec -it sim2real-go2_controller-1 python3 /workspace/sim2real_walk.py enp2s0
+docker exec -it go2real python3 /workspace/sim2real_walk.py
 '''
