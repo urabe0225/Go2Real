@@ -22,8 +22,8 @@ docker exec -it setup python /workspace/unitree_sdk2_python/example/go2/low_leve
 ### Trainingの実行
 ```
 cd ./Go2Real/training/
-docker compose up
-docker exec -it go2_controller python3 Genesis/examples/locomotion/go2_train.py --exp_name go2-walking --num_envs 4096 --max_iterations 1001 &
+docker compose up -d
+docker exec -it go2_controller python3 Genesis/examples/locomotion/go2_train.py --exp_name go2-walking --num_envs 4096 --max_iterations 1001 & docker exec -it go2_controller tensorborad --logdir logs
 ```
 
 ### Training結果の検証
@@ -54,7 +54,7 @@ docker exec -it go2real python3 /workspace/sim2real_walk.py --exp_name go2-walki
 ```
 cd ./Go2Real/training/
 docker compose up
-docker exec -it go2_controller python3 Genesis/examples/locomotion/friction_train.py --exp_name go2-friction --num_envs 4096 --max_iterations 1001 &
+docker exec -it go2_controller python3 Genesis/examples/locomotion/friction_train.py --exp_name go2-friction --num_envs 4096 --max_iterations 1001 & docker exec -it go2_controller tensorborad --logdir logs
 ```
 
 ### Training結果の検証
