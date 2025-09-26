@@ -4,9 +4,8 @@
 - [nvidia container toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html#with-apt-ubuntu-debian)
 
 ## GenesisのExampleで前進機能を学習
-
+### Go2を起動しイーサネットケーブルで接続
 ### Go2の検出
-- Go2を起動しイーサネットケーブルで接続
 ```
 cd ./Go2Real/setup/
 docker compose up -d
@@ -14,11 +13,10 @@ docker exec -it setup python /workspace/networkTest.py
 ```
 
 ### 初期姿勢コマンドの実行
-- Go2を起動しイーサネットケーブルで接続
 ```
 cd ./Go2Real/setup/
 docker compose up -d
-docker exec -it setup python /workspace/unitree_sdk2_python/example/go2/low_level/go2_stand_example.py enp2s0
+docker exec -it setup python /workspace/unitree_sdk2_python/example/go2/low_level/go2_stand_example.py $GO2interface
 ```
 
 ### Trainingの実行
