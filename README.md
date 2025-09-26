@@ -16,7 +16,7 @@ docker exec -it setup python /workspace/networkTest.py
 ```
 cd ./Go2Real/setup/
 docker compose up -d
-docker exec -it setup python /workspace/unitree_sdk2_python/example/go2/low_level/go2_stand_example.py $GO2interface
+docker exec -it setup python /workspace/unitree_sdk2_python/example/go2/low_level/go2_stand_example.py enp2s0
 ```
 
 ### Trainingの実行

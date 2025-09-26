@@ -52,9 +52,28 @@ RUN git clone https://github.com/unitreerobotics/unitree_sdk2_python.git && \
 RUN git clone https://github.com/Genesis-Embodied-AI/Genesis.git
 
 COPY requirements.txt /tmp/
-RUN pip install -r /tmp/requirements.txt
+RUN pip config set global.timeout 1000 && \
+    pip config set global.retries 10 && \
+    pip config set global.trusted-host pypi.org && \
+    pip config set global.trusted-host pypi.python.org && \
+    pip config set global.trusted-host files.pythonhosted.org
+RUN pip install --no-cache-dir --timeout=1000 --retries=10 \
+    numpy==2.2.6 \
+    scipy==1.15.3 \
+    pillow==11.3.0
+RUN pip install --no-cache-dir --timeout=1000 --retries=10 \
+    opencv-python==4.12.0.88 \
+    matplotlib==3.10.6
+RUN pip install --no-cache-dir --timeout=1000 --retries=10 \
+    vtk==9.5.1 \
+    pyvista==0.46.3
+RUN pip install --no-cache-dir --timeout=1000 --retries=10 \
+    usd-core==25.8 \
+    pymeshlab==2025.7
+RUN pip install --no-cache-dir --timeout=1000 --retries=10 -r /tmp/requirements.txt
+
 #RUN pip install --no-cache-dir genesis-world==0.3.3
-RUN pip install --no-cache-dir tensorboard rsl-rl-lib==2.2.4
+RUN pip install --no-cache-dir --timeout=1000 --retries=10 tensorboard rsl-rl-lib==2.2.4
 
 COPY ./scripts/go2_env.py /workspace/go2_env.py
 COPY ./scripts/friction_env.py /workspace/friction_env.py

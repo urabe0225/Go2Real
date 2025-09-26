@@ -115,13 +115,6 @@ def main():
         
         # 簡単な接続テスト
         time.sleep(1)
-
-        import os
-        # 環境変数の追加
-        os.environ['GO2interface'] = 'interface'
-
-        print(f"\nAdd Env value: {os.environ['GO2interface']}")
-
         print("Connection test completed.")
         
     except Exception as e:
