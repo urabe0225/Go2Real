@@ -23,7 +23,8 @@ docker exec -it setup python /workspace/unitree_sdk2_python/example/go2/low_leve
 ```
 cd ./Go2Real/training/
 docker compose up -d
-docker exec -it go2_controller python3 Genesis/examples/locomotion/go2_train.py --exp_name go2-walking --num_envs 4096 --max_iterations 1001 & docker exec -it go2_controller tensorborad --logdir logs
+docker exec -it go2_controller python3 Genesis/examples/locomotion/go2_train.py --exp_name go2-walking --num_envs 4096 --max_iterations 1001
+docker exec -it go2_controller tensorboard --logdir logs #トレーニングプロセスの確認
 ```
 
 ### Training結果の検証
@@ -35,7 +36,6 @@ docker exec -it go2_controller python3 Genesis/examples/locomotion/go2_eval.py -
 ```
 
 ### 実機での検証
-- Go2を起動しイーサネットケーブルで接続
 ```
 cd ./Go2Real/sim2real/
 docker compose up -d
@@ -43,7 +43,7 @@ docker exec -it go2real python3 /workspace/sim2real_walk.py --exp_name go2-walki
 ```
 
 ## GenesisのExampleを改良し床の反発係数を考慮した環境で学習(前進機能)
-
+### Go2を起動しイーサネットケーブルで接続
 ### Go2の検出
 > 省略
 
@@ -53,8 +53,9 @@ docker exec -it go2real python3 /workspace/sim2real_walk.py --exp_name go2-walki
 ### Trainingの実行
 ```
 cd ./Go2Real/training/
-docker compose up
-docker exec -it go2_controller python3 Genesis/examples/locomotion/friction_train.py --exp_name go2-friction --num_envs 4096 --max_iterations 1001 & docker exec -it go2_controller tensorborad --logdir logs
+docker compose up -d
+docker exec -it go2_controller python3 /workspace/friction_train.py --exp_name go2-friction --num_envs 4096 --max_iterations 1001
+docker exec -it go2_controller tensorboard --logdir logs #トレーニングプロセスの確認
 ```
 
 ### Training結果の検証
@@ -66,7 +67,6 @@ docker exec -it go2_controller python3 Genesis/examples/locomotion/go2_eval.py -
 ```
 
 ### 実機での検証
-- Go2を起動しイーサネットケーブルで接続
 ```
 cd ./Go2Real/sim2real/
 docker compose up -d
