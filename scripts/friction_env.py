@@ -68,85 +68,23 @@ class FrictionEnv(Go2Env):
                 foot_link.set_restitution(restitution_val, envs_idx=[env_idx_val])
 
     def step(self, actions):
-        self.actions = torch.clip(actions, -self.env_cfg["clip_actions"], self.env_cfg["clip_actions"])
-        exec_actions = self.last_actions if self.simulate_action_latency else self.actions
-        target_dof_pos = exec_actions * self.env_cfg["action_scale"] + self.default_dof_pos
-        self.robot.control_dofs_position(target_dof_pos, self.motors_dof_idx)
-        self.scene.step()
-
-        # update buffers
-        self.episode_length_buf += 1
-        self.base_pos[:] = self.robot.get_pos()
-        self.base_quat[:] = self.robot.get_quat()
-        self.base_euler = quat_to_xyz(
-            transform_quat_by_quat(torch.ones_like(self.base_quat) * self.inv_base_init_quat, self.base_quat),
-            rpy=True,
-            degrees=True,
-        )
-        inv_base_quat = inv_quat(self.base_quat)
-        self.base_lin_vel[:] = transform_by_quat(self.robot.get_vel(), inv_base_quat)
-        self.base_ang_vel[:] = transform_by_quat(self.robot.get_ang(), inv_base_quat)
-        self.projected_gravity = transform_by_quat(self.global_gravity, inv_base_quat)
-        self.dof_pos[:] = self.robot.get_dofs_position(self.motors_dof_idx)
-        self.dof_vel[:] = self.robot.get_dofs_velocity(self.motors_dof_idx)
-
-        # resample commands
-        envs_idx = (
-            (self.episode_length_buf % int(self.env_cfg["resampling_time_s"] / self.dt) == 0)
-            .nonzero(as_tuple=False)
-            .reshape((-1,))
-        )
-        self._resample_commands(envs_idx)
-
-        ###########################################################
+        # 親クラスのstepメソッドを呼び出す前に、摩擦係数の定期的な変更を処理
+        # episode_length_bufを更新するために一時的に処理
+        temp_episode_length = getattr(self, 'episode_length_buf', torch.zeros((self.num_envs,), device=self.device, dtype=gs.tc_int))
+        temp_episode_length += 1
+        
         # 摩擦係数の定期的な変更（オプション）
         friction_resample_time = self.env_cfg.get("friction_resample_time_s", 8.0)  # 8秒ごと
         friction_envs_idx = (
-            (self.episode_length_buf % int(friction_resample_time / self.dt) == 0)
+            (temp_episode_length % int(friction_resample_time / self.dt) == 0)
             .nonzero(as_tuple=False)
             .reshape((-1,))
         )
         if len(friction_envs_idx) > 0:
             self._randomize_friction(friction_envs_idx)
-        ###########################################################
 
-        # check termination and reset
-        self.reset_buf = self.episode_length_buf > self.max_episode_length
-        self.reset_buf |= torch.abs(self.base_euler[:, 1]) > self.env_cfg["termination_if_pitch_greater_than"]
-        self.reset_buf |= torch.abs(self.base_euler[:, 0]) > self.env_cfg["termination_if_roll_greater_than"]
-
-        time_out_idx = (self.episode_length_buf > self.max_episode_length).nonzero(as_tuple=False).reshape((-1,))
-        self.extras["time_outs"] = torch.zeros_like(self.reset_buf, device=gs.device, dtype=gs.tc_float)
-        self.extras["time_outs"][time_out_idx] = 1.0
-
-        self.reset_idx(self.reset_buf.nonzero(as_tuple=False).reshape((-1,)))
-
-        # compute reward
-        self.rew_buf[:] = 0.0
-        for name, reward_func in self.reward_functions.items():
-            rew = reward_func() * self.reward_scales[name]
-            self.rew_buf += rew
-            self.episode_sums[name] += rew
-
-        # compute observations
-        self.obs_buf = torch.cat(
-            [
-                self.base_ang_vel * self.obs_scales["ang_vel"],  # 3
-                self.projected_gravity,  # 3
-                self.commands * self.commands_scale,  # 3
-                (self.dof_pos - self.default_dof_pos) * self.obs_scales["dof_pos"],  # 12
-                self.dof_vel * self.obs_scales["dof_vel"],  # 12
-                self.actions,  # 12
-            ],
-            axis=-1,
-        )
-
-        self.last_actions[:] = self.actions[:]
-        self.last_dof_vel[:] = self.dof_vel[:]
-
-        self.extras["observations"]["critic"] = self.obs_buf
-
-        return self.obs_buf, self.rew_buf, self.reset_buf, self.extras
+        # 親クラスのstepメソッドを呼び出し
+        return super().step(actions)
 
     def reset_idx(self, envs_idx):
         super().reset_idx(envs_idx)
@@ -154,23 +92,26 @@ class FrictionEnv(Go2Env):
         self._randomize_friction(envs_idx)
 
     def reset(self):
-        super().reset()
+        result = super().reset()
+        # リセット時に全環境の摩擦係数をランダマイズ
+        self._randomize_friction(torch.arange(self.num_envs, device=self.device))
+        return result
 
     # ------------ reward functions----------------
     def _reward_tracking_lin_vel(self):
-        super()._reward_tracking_lin_vel()
+        return super()._reward_tracking_lin_vel()
 
     def _reward_tracking_ang_vel(self):
-        super()._reward_tracking_ang_vel()
+        return super()._reward_tracking_ang_vel()
 
     def _reward_lin_vel_z(self):
-        super()._reward_lin_vel_z()
+        return super()._reward_lin_vel_z()
 
     def _reward_action_rate(self):
-        super()._reward_action_rate()
+        return super()._reward_action_rate()
 
     def _reward_similar_to_default(self):
-        super()._reward_similar_to_default()
+        return super()._reward_similar_to_default()
 
     def _reward_base_height(self):
-        super()._reward_base_height()
+        return super()._reward_base_height()
