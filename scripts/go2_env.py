@@ -187,6 +187,13 @@ class Go2Env:
 
         return self.obs_buf, self.rew_buf, self.reset_buf, self.extras
 
+    def get_observations(self):
+        self.extras["observations"]["critic"] = self.obs_buf
+        return self.obs_buf, self.extras
+
+    def get_privileged_observations(self):
+        return None
+
     def reset_idx(self, envs_idx):
         if len(envs_idx) == 0:
             return

@@ -2,7 +2,7 @@ import torch
 import math
 import genesis as gs
 from genesis.utils.geom import quat_to_xyz, transform_by_quat, inv_quat, transform_quat_by_quat
-#from go2_env import Go2Env
+from go2_env import Go2Env
 
 def gs_rand_float(lower, upper, shape, device):
     return (upper - lower) * torch.rand(size=shape, device=device) + lower

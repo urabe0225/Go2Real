@@ -171,7 +171,7 @@ def main():
         open(f"{log_dir}/cfgs.pkl", "wb"),
     )
 
-    env = Go2Env(
+    env = FrictionEnv(
         num_envs=args.num_envs, env_cfg=env_cfg, obs_cfg=obs_cfg, reward_cfg=reward_cfg, command_cfg=command_cfg
     )
 
