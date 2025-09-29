@@ -3,10 +3,8 @@ import math
 import genesis as gs
 from genesis.utils.geom import quat_to_xyz, transform_by_quat, inv_quat, transform_quat_by_quat
 
-
 def gs_rand_float(lower, upper, shape, device):
     return (upper - lower) * torch.rand(size=shape, device=device) + lower
-
 
 class Go2Env:
     def __init__(self, num_envs, env_cfg, obs_cfg, reward_cfg, command_cfg, show_viewer=False):
@@ -51,8 +49,8 @@ class Go2Env:
             show_viewer=show_viewer,
         )
 
-        # add plain
-        self.scene.add_entity(gs.morphs.URDF(file="urdf/plane/plane.urdf", fixed=True))
+        # add plane
+        self.plane = self.scene.add_entity(gs.morphs.URDF(file="urdf/plane/plane.urdf", fixed=True))
 
         # add robot
         self.base_init_pos = torch.tensor(self.env_cfg["base_init_pos"], device=gs.device)
@@ -188,13 +186,6 @@ class Go2Env:
         self.extras["observations"]["critic"] = self.obs_buf
 
         return self.obs_buf, self.rew_buf, self.reset_buf, self.extras
-
-    def get_observations(self):
-        self.extras["observations"]["critic"] = self.obs_buf
-        return self.obs_buf, self.extras
-
-    def get_privileged_observations(self):
-        return None
 
     def reset_idx(self, envs_idx):
         if len(envs_idx) == 0:
