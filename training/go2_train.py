@@ -2,7 +2,11 @@ import argparse
 import os
 import pickle
 import shutil
+import sys
 from importlib import metadata
+
+# scriptsディレクトリのパスを追加
+sys.path.append(os.path.join(os.path.dirname(__file__), '..', 'scripts'))
 
 try:
     try:
@@ -66,7 +70,7 @@ def get_train_cfg(exp_name, max_iterations):
     return train_cfg_dict
 
 
-def get_cfgs():
+def get_cfgs(friction_mode=False):
     env_cfg = {
         "num_actions": 12,
         # joint/link names
@@ -113,6 +117,14 @@ def get_cfgs():
         "simulate_action_latency": True,
         "clip_actions": 100.0,
     }
+    
+    # 摩擦モードの場合、摩擦関連パラメータを追加
+    if friction_mode:
+        env_cfg.update({
+            "friction_range": [0.2, 1.5],  # 低摩擦(氷)から高摩擦(ゴム)まで
+            "restitution_range": [0.0, 0.3],  # 反発係数
+            "friction_resample_time_s": 8.0,  # 摩擦係数を変更する間隔
+        })
     obs_cfg = {
         "num_obs": 45,
         "obs_scales": {
@@ -137,7 +149,7 @@ def get_cfgs():
     }
     command_cfg = {
         "num_commands": 3,
-        "lin_vel_x_range": [0.5, 0.5],
+        "lin_vel_x_range": [0.3, 0.3] if friction_mode else [0.5, 0.5],  # 摩擦モードでは少し遅く
         "lin_vel_y_range": [0, 0],
         "ang_vel_range": [0, 0],
     }
@@ -149,7 +161,7 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("-e", "--exp_name", type=str, default="go2-walking")
     parser.add_argument("-B", "--num_envs", type=int, default=4096)
-    parser.add_argument("--max_iterations", type=int, default=1001)
+    parser.add_argument("--max_iterations", type=int, default=101)
     args = parser.parse_args()
 
     gs.init(logging_level="warning")
@@ -181,5 +193,5 @@ if __name__ == "__main__":
 
 """
 # training
-python examples/locomotion/go2_train.py
+python training/go2_train.py
 """
