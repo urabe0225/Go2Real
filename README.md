@@ -32,7 +32,7 @@ docker exec -it go2_controller tensorboard --logdir logs #トレーニングプ�
 xhost +local:docker
 cd ./Go2Real/eval/
 docker compose up -d
-docker exec -it go2_controller python3 Genesis/examples/locomotion/go2_eval.py --exp_name go2-walking --ckpt 1000
+docker exec -it go2_eval python3 Genesis/examples/locomotion/go2_eval.py --exp_name go2-walking --ckpt 1000
 ```
 
 ### 実機での検証
@@ -63,7 +63,7 @@ docker exec -it go2_controller tensorboard --logdir logs #トレーニングプ�
 xhost +local:docker
 cd ./Go2Real/eval/
 docker compose up -d
-docker exec -it go2_controller python3 Genesis/examples/locomotion/go2_eval.py --exp_name go2-friction --ckpt 1000
+docker exec -it go2_eval python3 Genesis/examples/locomotion/go2_eval.py --exp_name go2-friction --ckpt 1000
 ```
 
 ### 実機での検証
